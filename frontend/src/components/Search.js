@@ -1,27 +1,31 @@
-import { useRef } from "react"
+import {useEffect, useRef} from "react"
 import axios from 'axios'
 
 function Search(props) {
 	const inputName = useRef();
 
-	async function handleSearchBtnClick() {
-		const albumsData = {
-			data: [{item: 1}],
-			err: []
-		};
-		await axios
-		  .post("http://localhost:3001/api/search", {"albumTitle": inputName.current.value })
-		  .then((response)=>{
-			albumsData.data = response.data.data;
-		  })
-		  .catch(err => albumsData.error = err);
-
-		  props.updateAlbums(albumsData)
+	function handleSearchBtnClick() {
+		if (inputName.current.value.length > 4) {
+			const albumsData = {
+				data: [{item: 1}],
+				err: []
+			};
+			axios
+				.post("http://localhost:3001/api/search", {"albumTitle": inputName.current.value })
+				.then(response => {
+					albumsData.data = response.data;
+					console.log(response);
+					props.updateAlbums(albumsData)
+				})
+				.catch(err => albumsData.error = err);
+		} else {
+			alert("Input must be longer than 5 char")
+		}
 	}
 
 	function handleKeyDown(event) {
-		if (event.key === "Enter") {
-			console.log("Hit");
+		if (event.key === "Enter" && inputName.current.value.length > 4) {
+			handleSearchBtnClick();
 		}
 	}
 	return (
